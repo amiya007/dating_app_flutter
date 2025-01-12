@@ -38,12 +38,13 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    connectToServer();
   }
 
   void connectToServer() {
-    socket = io.io('ws://192.168.56.1:3000/', <String, dynamic>{
+    socket = io.io('http://192.168.1.3:3000/', <String, dynamic>{
       'transports': ['websocket'],
+      // "connection": "upgrade",
+      // "upgrade": "websocket",
       'autoConnect': true,
     });
 
@@ -60,9 +61,9 @@ class _ChatScreenState extends State<ChatScreen> {
       log('Error: $data');
     });
     socket.on('receive_message', (data) {
-      // setState(() {
-      //   messages.add(data);
-      // });
+      setState(() {
+        messages.add(data);
+      });
       log(messages.toString());
     });
     log(socket.connected.toString());
@@ -89,6 +90,20 @@ class _ChatScreenState extends State<ChatScreen> {
       appBar: AppBar(
         title: const Text('Chat App'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.cast_connected),
+            onPressed: () {
+              connectToServer();
+            },
+          ),
+          IconButton(
+            onPressed: () async {
+              socket.disconnect();
+            },
+            icon: const Icon(Icons.close),
+          ),
+        ],
       ),
       body: Column(
         children: [
